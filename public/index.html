@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PM</title>
+</head>
+<body>
+  <select id="users" style="display: block; margin: 20px 0;">
+    <option value="luiz">Luiz</option>
+    <option value="carlos">Carlos</option>
+    <option value="joao">João</option>
+  </select>
+  <div style="border: 1px solid black; padding: 20px; display: inline-block;">
+    <h3>{{user}}</h3>
+    <p class="recived"></p>
+    <textarea class="message" cols="30" rows="10"></textarea>
+    <br>
+    <br>
+    <button class="btn-enviar">Enviar</button>
+  </div>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  (function () {
+    var socket = io('http://localhost:3000/chat'),
+        users = document.querySelector('#users'),
+        btn = document.querySelector('.btn-enviar'),
+        messages = document.querySelector('.recived'),
+        user = prompt('Usuario: ');
+
+    socket.emit('open', user);
+
+    btn.addEventListener('click', function(e){
+      socket.emit('send', {
+          from: user,
+          to: users.value,
+          message: e.target.parentElement.querySelector('.message').value
+      });
+    });
+
+    socket.on('conversation', function(data) {
+      console.log(data);
+      messages.innerHTML += data.from + ' => ' + data.message + '<br>';
+    });
+  }())
+</script>
+</html>
